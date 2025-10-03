@@ -1,5 +1,5 @@
 {
-  "name": "frontend-vue",
+  "name": "YMP-frontend-vue",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -7,6 +7,8 @@
     "build": "vue-cli-service build"
   },
   "dependencies": {
+    "ant-design-vue": "^4.2.6",
+    "axios": "^1.12.2",
     "core-js": "^3.8.3",
     "vue": "^3.2.13",
     "vue-router": "^4.0.3"

@@ -1,4 +1,4 @@
-# frontend-vue
+# YMP-frontend-vue
 
 ## Project setup
 ```
