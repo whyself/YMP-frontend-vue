@@ -10,34 +10,41 @@
             <a-col flex="auto">
                 <a-menu v-model:selectedKeys="current" mode="horizontal" :items="items" @click="doMenuClick" />
             </a-col>
-            <a-col flex="80px">
-                <div class="user-login-status">
-                    <a-button type="primary" href="/user/login">登录</a-button>
+            <a-col flex="160px">
+                <div class="user-login-status btn-group">
+                    <template v-if="isLogin">
+                        <span class="welcome-user">欢迎 {{ username }} 用户</span>
+                        <a-button @click="logout">退出</a-button>
+                    </template>
+                    <template v-else>
+                        <a-button type="primary" @click="() => router.push('/user/login')" style="margin-top: 16px;">登录</a-button>
+                        <a-button @click="() => router.push('/user/register')" style="margin-top: 16px;">注册</a-button>
+                    </template>
                 </div>
             </a-col>
         </a-row>
     </div>
 </template>
-<script setup>
-import { h, ref } from 'vue';
+
+<script setup lang="ts">
+import { h, ref, watch } from 'vue';
 import { HomeOutlined, CrownOutlined } from '@ant-design/icons-vue';
 import { useRouter } from 'vue-router';
 
 const router = useRouter();
 
-const doMenuClick = ({ key }) => {
+const doMenuClick = ({ key }: { key: string }) => {
     router.push({
         path: key,
     });
 };
 
-const current = ref(['']);
-
+const current = ref<string[]>([router.currentRoute.value.path]);
 router.afterEach((to) => {
     current.value = [to.path];
 });
 
-const items = ref([
+const items = [
     {
         key: '/',
         icon: () => h(HomeOutlined),
@@ -45,20 +52,10 @@ const items = ref([
         title: '主页',
     },
     {
-        key: '/user/login',
-        label: '用户登录',
-        title: '用户登录',
-    },
-    {
-        key: '/user/register',
-        label: '用户注册',
-        title: '用户注册',
-    },
-    {
-        key: '/admin/userManage',
+        key: '/subscriptions',
         icon: () => h(CrownOutlined),
-        label: '用户管理',
-        title: '用户管理',
+        label: '订阅管理',
+        title: '订阅管理',
     },
     {
         key: 'others',
@@ -72,12 +69,48 @@ const items = ref([
         ),
         title: '关于我们',
     },
-]);
+];
+
+const username = ref(localStorage.getItem('username') || '用户');
+const isLogin = ref(!!localStorage.getItem('token'));
+
+function updateLoginState() {
+    isLogin.value = !!localStorage.getItem('token');
+    username.value = localStorage.getItem('username') || '用户';
+}
+
+function logout() {
+    localStorage.removeItem('token');
+    localStorage.removeItem('username');
+    updateLoginState();
+    router.push('/user/login');
+}
+
+// 监听路由变化，防止手动跳转后状态不同步
+router.afterEach(() => {
+    updateLoginState();
+});
 </script>
+
 <style scoped>
 .title-bar {
     display: flex;
     align-items: center;
+}
+
+.btn-group {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 12px;
+    margin: 0;
+}
+.welcome-user {
+    margin-right: 0;
+    font-weight: 500;
+    font-size: 16px;
+    color: #1890ff;
+    white-space: nowrap;
 }
 
 .logo {
